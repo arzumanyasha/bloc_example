@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum ColorEvent {
   // ignore: constant_identifier_names
@@ -9,33 +10,16 @@ enum ColorEvent {
   event_green
 }
 
-class ColorBloc {
+class ColorBloc extends Bloc<ColorEvent, Color> {
   Color _color = Colors.red;
 
-  final _inputEventController = StreamController<ColorEvent>();
-  StreamSink<ColorEvent> get inputEventSink => _inputEventController.sink;
+  ColorBloc(Color initialState) : super(initialState);
 
-  final _outputStateController = StreamController<Color>();
-  Stream<Color> get outpurStateStream => _outputStateController.stream;
-
-  void _mapEventToState(ColorEvent event) {
-    if (event == ColorEvent.event_red) {
-      _color = Colors.red;
-    } else if (event == ColorEvent.event_green) {
-      _color = Colors.green;
-    } else {
-      throw Exception("Wrong!");
-    }
-
-    _outputStateController.sink.add(_color);
+  @override
+  Stream<Color> mapEventToState(ColorEvent event) async* {
+    _color = (event == ColorEvent.event_red) ? Colors.red : Colors.green;
+    yield _color;
   }
 
-  ColorBloc() {
-    _inputEventController.stream.listen(_mapEventToState);
-  }
 
-  void dispose() {
-    _inputEventController.close();
-    _outputStateController.close();
-  }
 }
